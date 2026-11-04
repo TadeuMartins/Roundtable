@@ -9,6 +9,10 @@
     :root { --ink: #000028; --white: #fff; --mint: #00ffb9; --cyan: #64d8ff; --muted: #a7b3bd; --line: #30475d; --amber: #ffce70; --rose: #ffaaa8; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--ink); color: var(--white); font-family: Arial, sans-serif; letter-spacing: 0; }
+    body[data-theme="mint"] { --ink: #00d7a0; --white: #000028; --mint: #000028; --muted: #173b40; --line: #008a71; --amber: #683100; --rose: #860f33; }
+    body[data-theme="paper"] { --ink: #f3f3f0; --white: #000028; --mint: #00664d; --muted: #40505b; --line: #b2bfbc; --amber: #683100; --rose: #860f33; }
+    body[data-theme="mint"] .brand img, body[data-theme="paper"] .brand img,
+    body[data-theme="mint"] .speaker-company[data-monochrome="true"], body[data-theme="paper"] .speaker-company[data-monochrome="true"] { filter: brightness(0); }
     button { font: inherit; color: inherit; cursor: pointer; }
     button:focus-visible { outline: 2px solid var(--mint); outline-offset: 5px; }
     button:disabled { opacity: .35; cursor: default; }
@@ -45,6 +49,18 @@
     .session-options button { display: block; width: 100%; padding: 12px 10px; text-align: left; font-size: 13px; background: none; border: 0; }
     .session-options button:hover, .session-options button:focus-visible { background: #ffffff10; }
     .session-options button[aria-current="true"] { color: var(--mint); }
+    .session-options { max-height: 65svh; overflow-y: auto; }
+    #event-screen { position: fixed; inset: 0; }
+    #event-slide { display: block; width: 100%; height: 100%; object-fit: contain; }
+    body[data-view="event"] .shell { min-height: 0; }
+    body[data-view="event"] .brand, body[data-view="event"] .timers, body[data-view="event"] footer,
+    body[data-view="event"] main > :not(.session-control) { display: none; }
+    body[data-view="event"] main { display: contents; }
+    body[data-view="event"] .masthead { position: fixed; z-index: 3; right: 16px; bottom: 16px; min-height: 0; padding: 0; }
+    body[data-view="event"] .timer-tools { display: flex; gap: 6px; }
+    body[data-view="event"] .session-control { position: fixed; z-index: 3; left: 20px; bottom: 16px; margin: 0; max-width: calc(100vw - 120px); }
+    body[data-view="event"] .session-options { top: auto; bottom: calc(100% + 8px); }
+    body[data-view="event"] #session-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     h1 { font-size: 64px; font-weight: 400; line-height: 1.04; max-width: 1320px; margin: 0; text-wrap: balance; }
     h1 span { color: var(--mint); }
     .participants { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; list-style: none; padding: 0; margin: 32px 0 0; }
@@ -62,7 +78,7 @@
     .round-head { display: flex; align-items: center; gap: 14px; }
     .round-number { color: var(--mint); font-size: 11px; }
     h2 { font-size: 13px; font-weight: 400; color: var(--muted); margin: 0; }
-    .question { font-size: 19px; line-height: 1.5; margin: 15px 0 0; color: #e2e8eb; }
+    .question { font-size: 19px; line-height: 1.5; margin: 15px 0 0; color: var(--white); }
     .motion-band { margin-top: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 8px 0; }
     .flow-visual { position: relative; width: 100%; max-width: 480px; min-width: 0; padding-right: 38px; }
     .flow-visual > img { display: block; width: 100%; height: auto; max-height: 66px; object-fit: contain; aspect-ratio: 1200 / 180; }
@@ -93,6 +109,7 @@
   </style>
 </head>
 <body>
+  <section id="event-screen" hidden aria-label="Evento"><img id="event-slide" width="1920" height="1080" alt=""></section>
   <div class="shell">
     <header class="masthead">
       <div class="brand"><img src="Logo-Siemens_original.png" width="1180" height="224" alt="Siemens"><div class="event"><strong>TRANSFORM 2026</strong>Beyond the Stage</div></div>
@@ -160,6 +177,7 @@
     const panels = [
       {
         category: 'T\u00e9cnica 1 / Sustenta\u00e7\u00e3o',
+        theme: 'mint',
         title: 'Sustenta\u00e7\u00e3o de aplica\u00e7\u00f5es inteligentes:',
         focus: 'quem mant\u00e9m depois da entrega?',
         questions: [
@@ -171,6 +189,7 @@
       },
       {
         category: 'T\u00e9cnica 2 / Dados e agentes',
+        theme: 'paper',
         title: 'Dados, agentes e processos:',
         focus: 'est\u00e3o realmente conectados e contextualizados?',
         questions: [
@@ -182,6 +201,7 @@
       },
       {
         category: 'Executiva 1 / Portf\u00f3lio e valor',
+        theme: 'paper',
         title: 'Do caso de uso ao portf\u00f3lio:',
         focus: 'onde investir e onde parar',
         questions: [
@@ -193,6 +213,7 @@
       },
       {
         category: 'Executiva 2 / Integra\u00e7\u00e3o sem ruptura',
+        theme: 'mint',
         title: 'Integra\u00e7\u00e3o sem ruptura:',
         focus: 'estender o core ou substituir?',
         questions: [
@@ -204,10 +225,24 @@
       }
     ];
     const duration = 10 * 60 * 1000;
+    const program = [
+      {panel: 0, label: 'Roda de Conversa T\u00e9cnica 1'},
+      {slide: 2, theme: 'paper', label: 'TECH SESSION - TWRT'},
+      {slide: 3, theme: 'dark', label: 'TECH SESSION - Do SAP Clean ao SAP Inteligente'},
+      {panel: 1, label: 'Roda de Conversa T\u00e9cnica 2'},
+      {slide: 5, theme: 'dark', label: 'TECH SESSION - O novo paradigma: IA que constr\u00f3i IA'},
+      {panel: 2, label: 'Roda de Conversa Executiva 1'},
+      {slide: 7, theme: 'paper', label: 'EXEC SESSION - TWRT'},
+      {slide: 8, theme: 'dark', label: 'EXEC SESSION - Do Discovery \u00e0 Produ\u00e7\u00e3o com IA'},
+      {panel: 3, label: 'Roda de Conversa Executiva 2'},
+      {slide: 10, theme: 'dark', label: 'EXEC SESSION - Menos prazo. Menos custo. Mais valor.'}
+    ];
     const storageKey = 'transform2026-mediation-v1';
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
     let motionEnabled = !reducedMotion.matches;
     let selectedPanel = 0;
+    let selectedScreen = 0;
+    let sequenceEnded = false;
     let steps = panels.map(() => 0);
     let timers = panels.map(() => Array.from({length: 2}, () => ({remaining: duration, deadline: null})));
     try {
@@ -217,6 +252,10 @@
             Array.isArray(pair) && pair.length === 2 && pair.every(timer => timer && Number.isFinite(timer.remaining) && timer.remaining >= 0 && timer.remaining <= duration &&
               (timer.deadline === null || (Number.isFinite(timer.deadline) && timer.deadline > 0))))) {
         selectedPanel = saved.selectedPanel;
+        selectedScreen = program.findIndex(screen => screen.panel === selectedPanel);
+        if (Number.isInteger(saved.selectedScreen) && saved.selectedScreen >= 0 && saved.selectedScreen < program.length &&
+          (program[saved.selectedScreen].panel === undefined || program[saved.selectedScreen].panel === selectedPanel)) selectedScreen = saved.selectedScreen;
+        sequenceEnded = saved.sequenceEnded === true && selectedScreen === program.length - 1;
         timers = saved.timers;
         steps = Array.isArray(saved.steps) && saved.steps.length === panels.length && saved.steps.every(step => Number.isInteger(step) && step >= 0 && step <= 3)
           ? saved.steps
@@ -230,9 +269,18 @@
     } catch {}
     const timerElements = [...document.querySelectorAll('.timer')];
     const sessionControl = document.getElementById('session-control');
+    const screenOptions = program.map((screen, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.screen = index;
+      if (screen.panel !== undefined) button.dataset.panel = screen.panel;
+      button.textContent = screen.label;
+      return button;
+    });
+    sessionControl.querySelector('.session-options').replaceChildren(...screenOptions);
     const sessionOptions = [...sessionControl.querySelectorAll('[data-panel]')];
     function save() {
-      try { localStorage.setItem(storageKey, JSON.stringify({selectedPanel, timers, steps})); } catch {}
+      try { localStorage.setItem(storageKey, JSON.stringify({selectedPanel, selectedScreen, sequenceEnded, timers, steps})); } catch {}
     }
     function icon(button, name) {
       if (button.dataset.icon === name) return;
@@ -267,6 +315,13 @@
           }
         });
       });
+      const advanceButton = document.getElementById('advance');
+      if (program[selectedScreen].panel === undefined) {
+        label(advanceButton, sequenceEnded ? 'Programa encerrado' : selectedScreen === program.length - 1 ? 'Encerrar programa' : 'Avan\u00e7ar para ' + program[selectedScreen + 1].label);
+        advanceButton.disabled = sequenceEnded;
+        if (changed) save();
+        return;
+      }
       timerElements.forEach((element, roundIndex) => {
         const timer = timers[selectedPanel][roundIndex];
         const timeLeft = remaining(timer);
@@ -286,28 +341,34 @@
         element.querySelector('.reset-timer').disabled = status === 'ready';
         document.getElementById(`round-${roundIndex}`).dataset.active = String(running);
       });
-      const advanceButton = document.getElementById('advance');
       const step = steps[selectedPanel];
-      label(advanceButton, step < 2 ? `Iniciar bloco ${step + 1}` : step === 3 ? 'Mesa encerrada' : selectedPanel < panels.length - 1 ? 'Avan\u00e7ar para a pr\u00f3xima mesa' : 'Encerrar \u00faltima mesa');
-      advanceButton.disabled = step === 3;
+      label(advanceButton, step < 2 ? `Iniciar bloco ${step + 1}` : 'Avan\u00e7ar para ' + program[selectedScreen + 1].label);
+      advanceButton.disabled = false;
       if (changed) save();
     }
     function advance() {
       sessionControl.open = false;
+      if (sequenceEnded) return;
+      if (program[selectedScreen].panel === undefined) {
+        if (selectedScreen < program.length - 1) selectScreen(selectedScreen + 1);
+        else {
+          sequenceEnded = true;
+          document.getElementById('announcement').textContent = 'Programa encerrado.';
+          save();
+          refresh();
+        }
+        return;
+      }
       const step = steps[selectedPanel];
-      if (step === 3) return;
       pauseTimers(selectedPanel);
       if (step < 2) {
         const timer = timers[selectedPanel][step];
         if (timer.remaining === 0) timer.remaining = duration;
         timer.deadline = Date.now() + timer.remaining;
         steps[selectedPanel] = step + 1;
-      } else if (selectedPanel < panels.length - 1) {
-        selectPanel(selectedPanel + 1);
-        return;
       } else {
-        steps[selectedPanel] = 3;
-        document.getElementById('announcement').textContent = '\u00daltima mesa encerrada.';
+        selectScreen(selectedScreen + 1);
+        return;
       }
       save();
       refresh();
@@ -353,6 +414,11 @@
       }));
     }
     function selectPanel(panelIndex, restartSequence = true) {
+      selectedScreen = program.findIndex(screen => screen.panel === panelIndex);
+      sequenceEnded = false;
+      document.body.dataset.view = 'panel';
+      document.getElementById('event-screen').hidden = true;
+      document.getElementById('topic').setAttribute('aria-labelledby', 'theme');
       if (restartSequence) {
         pauseTimers(selectedPanel);
         if (panelIndex !== selectedPanel) pauseTimers(panelIndex);
@@ -360,9 +426,10 @@
       }
       selectedPanel = panelIndex;
       const panel = panels[panelIndex];
+      document.body.dataset.theme = panel.theme;
       renderSpeakers(panel);
       document.getElementById('session-name').textContent = sessionOptions[panelIndex].textContent;
-      sessionOptions.forEach((option, index) => option.setAttribute('aria-current', String(index === panelIndex)));
+      screenOptions.forEach((option, index) => option.setAttribute('aria-current', String(index === selectedScreen)));
       const focus = document.createElement('span');
       focus.textContent = panel.focus;
       document.getElementById('theme').replaceChildren(panel.title + ' ', focus);
@@ -371,8 +438,28 @@
       refresh();
       save();
     }
-    sessionOptions.forEach(option => option.addEventListener('click', () => {
-      selectPanel(Number(option.dataset.panel));
+    function selectScreen(screenIndex, restartSequence = true) {
+      const screen = program[screenIndex];
+      if (screen.panel !== undefined) { selectPanel(screen.panel, restartSequence); return; }
+      timers.forEach((pair, panelIndex) => pauseTimers(panelIndex));
+      selectedScreen = screenIndex;
+      if (restartSequence) sequenceEnded = false;
+      document.body.dataset.view = 'event';
+      document.body.dataset.theme = screen.theme;
+      document.getElementById('topic').removeAttribute('aria-labelledby');
+      const eventScreen = document.getElementById('event-screen');
+      eventScreen.hidden = false;
+      eventScreen.setAttribute('aria-label', screen.label);
+      const image = document.getElementById('event-slide');
+      image.src = `Events/slide-${screen.slide}.png`;
+      image.alt = screen.label;
+      document.getElementById('session-name').textContent = screen.label;
+      screenOptions.forEach((option, index) => option.setAttribute('aria-current', String(index === selectedScreen)));
+      refresh();
+      save();
+    }
+    screenOptions.forEach(option => option.addEventListener('click', () => {
+      selectScreen(Number(option.dataset.screen));
       sessionControl.open = false;
       document.getElementById('advance').focus({preventScroll: true});
     }));
@@ -434,7 +521,7 @@
     });
     document.addEventListener('visibilitychange', refresh);
     lucide.createIcons();
-    selectPanel(selectedPanel, false);
+    selectScreen(selectedScreen, false);
     setInterval(refresh, 200);
   </script>
 </body>
