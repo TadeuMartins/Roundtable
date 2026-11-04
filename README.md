@@ -13,8 +13,10 @@ https://tadeumartins.github.io/Roundtable/
 - Page Down e a seta direita executam o mesmo comando, inclusive com o menu de mesas aberto. O menu fecha ao avancar.
 - Apenas o nome da roda atual aparece acima do titulo. O seletor compacto permite escolher outra mesa diretamente.
 - Ao avancar, o cronometro anterior fica pausado; a proxima mesa abre sem iniciar a contagem.
+- Entrar em uma mesa pelo menu ou pelo avanco prepara a primeira rodada, mesmo se a mesa ja foi usada. Tempos restantes sao preservados; uma rodada esgotada volta a 10 minutos quando iniciada pelo avanco.
 - Na ultima mesa, o comando encerra a sequencia, sem voltar ao inicio.
 - Os controles individuais permitem pausar e reiniciar cada cronometro.
+- Iniciar uma rodada pelo controle individual sincroniza o avanco com essa rodada e pausa a outra.
 - Tempos e progresso ficam salvos apenas no navegador usado para a mediacao.
 - O QR Code abre o formulario original de perguntas do evento. O formulario requer internet.
 

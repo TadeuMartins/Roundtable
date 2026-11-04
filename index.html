@@ -190,6 +190,11 @@
         steps = Array.isArray(saved.steps) && saved.steps.length === panels.length && saved.steps.every(step => Number.isInteger(step) && step >= 0 && step <= 3)
           ? saved.steps
           : timers.map(pair => pair.reduce((step, timer, index) => timer.deadline !== null || timer.remaining < duration ? index + 1 : step, 0));
+        timers.forEach((pair, panelIndex) => {
+          const runningRounds = pair.map((timer, index) => timer.deadline !== null ? index : -1).filter(index => index !== -1);
+          if (runningRounds.length === 1) steps[panelIndex] = runningRounds[0] + 1;
+          else if (pair.every(timer => timer.remaining === duration && timer.deadline === null)) steps[panelIndex] = 0;
+        });
       }
     } catch {}
     const timerElements = [...document.querySelectorAll('.timer')];
@@ -212,6 +217,12 @@
     }
     function remaining(timer) {
       return timer.deadline === null ? timer.remaining : Math.min(duration, Math.max(0, timer.deadline - Date.now()));
+    }
+    function pauseTimers(panelIndex) {
+      timers[panelIndex].forEach(timer => {
+        timer.remaining = remaining(timer);
+        timer.deadline = null;
+      });
     }
     function refresh() {
       let changed = false;
@@ -254,13 +265,11 @@
       sessionControl.open = false;
       const step = steps[selectedPanel];
       if (step === 3) return;
-      timers[selectedPanel].forEach(timer => {
-        timer.remaining = remaining(timer);
-        timer.deadline = null;
-      });
+      pauseTimers(selectedPanel);
       if (step < 2) {
         const timer = timers[selectedPanel][step];
-        if (timer.remaining > 0) timer.deadline = Date.now() + timer.remaining;
+        if (timer.remaining === 0) timer.remaining = duration;
+        timer.deadline = Date.now() + timer.remaining;
         steps[selectedPanel] = step + 1;
       } else if (selectedPanel < panels.length - 1) {
         selectPanel(selectedPanel + 1);
@@ -278,7 +287,12 @@
       label(button, motionEnabled ? 'Pausar anima\u00e7\u00e3o' : 'Ativar anima\u00e7\u00e3o');
       icon(button, motionEnabled ? 'pause' : 'play');
     }
-    function selectPanel(panelIndex) {
+    function selectPanel(panelIndex, restartSequence = true) {
+      if (restartSequence) {
+        pauseTimers(selectedPanel);
+        if (panelIndex !== selectedPanel) pauseTimers(panelIndex);
+        steps[panelIndex] = 0;
+      }
       selectedPanel = panelIndex;
       const panel = panels[panelIndex];
       document.getElementById('session-name').textContent = sessionOptions[panelIndex].textContent;
@@ -314,8 +328,9 @@
           timer.remaining = timeLeft;
           timer.deadline = null;
         } else {
+          pauseTimers(selectedPanel);
           timer.deadline = Date.now() + timeLeft;
-          steps[selectedPanel] = Math.max(steps[selectedPanel] === 3 ? 0 : steps[selectedPanel], roundIndex + 1);
+          steps[selectedPanel] = roundIndex + 1;
         }
         save();
         refresh();
@@ -353,7 +368,7 @@
     });
     document.addEventListener('visibilitychange', refresh);
     lucide.createIcons();
-    selectPanel(selectedPanel);
+    selectPanel(selectedPanel, false);
     setInterval(refresh, 200);
   </script>
 </body>
