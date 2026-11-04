@@ -9,7 +9,7 @@ https://tadeumartins.github.io/Roundtable/
 
 ## Apresentacao
 
-- Tema, fotos e nomes dos participantes ficam centralizados e em destaque. Uma animacao compacta de cada tema ocupa apenas a linha do rodape, com pausa e suporte a movimento reduzido.
+- Tema e dados dos participantes ficam alinhados a esquerda, com a parte principal do titulo em negrito. O rodape exibe a data e uma animacao compacta de cada tema, com pausa e suporte a movimento reduzido; "Beyond the Stage" aparece apenas no cabecalho.
 - O botao de avancar inicia o bloco 1, depois o bloco 2 e depois abre o proximo evento do programa. Cada evento avanca com um clique; a mesa seguinte abre com os cronometros parados.
 - Page Down e a seta direita executam o mesmo comando, inclusive com o menu de mesas aberto. O menu fecha ao avancar.
 - A seta esquerda, Page Up e o botao de voltar percorrem a sequencia no sentido inverso, incluindo as rodadas e os eventos. Voltar preserva o tempo restante e deixa os cronometros pausados; no inicio, nao volta ao fim.
