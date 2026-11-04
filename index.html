@@ -306,8 +306,9 @@
     document.addEventListener('keydown', event => {
       if (event.defaultPrevented || event.repeat || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
       if (!['ArrowRight', 'PageDown'].includes(event.key)) return;
-      if (event.target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]')) return;
+      if (event.target !== sessionPicker && event.target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]')) return;
       event.preventDefault();
+      if (event.target === sessionPicker) document.getElementById('advance').focus({preventScroll: true});
       advance();
     });
     document.getElementById('motion').addEventListener('click', () => { motionEnabled = !motionEnabled; updateMotion(); });
