@@ -1,7 +1,7 @@
 # TRANSFORM 2026 - Roundtable
 
 Pagina de mediacao das quatro mesas-redondas, com temas, perguntas resumidas,
-dois cronometros de 10 minutos por mesa, animacoes e QR Code da plateia.
+participantes, dois cronometros de 10 minutos por mesa e QR Code da plateia.
 
 ## Site
 
@@ -9,8 +9,10 @@ https://tadeumartins.github.io/Roundtable/
 
 ## Apresentacao
 
+- Tema, fotos e nomes dos participantes ficam centralizados e em destaque. Uma animacao compacta de cada tema ocupa apenas a linha do rodape, com pausa e suporte a movimento reduzido.
 - O botao de avancar inicia o bloco 1, depois o bloco 2 e depois abre o proximo evento do programa. Cada evento avanca com um clique; a mesa seguinte abre com os cronometros parados.
 - Page Down e a seta direita executam o mesmo comando, inclusive com o menu de mesas aberto. O menu fecha ao avancar.
+- A seta esquerda, Page Up e o botao de voltar percorrem a sequencia no sentido inverso, incluindo as rodadas e os eventos. Voltar preserva o tempo restante e deixa os cronometros pausados; no inicio, nao volta ao fim.
 - Apenas o nome da roda atual aparece acima do titulo. O seletor compacto permite escolher outra mesa diretamente.
 - Ao avancar, o cronometro anterior fica pausado; a proxima mesa abre sem iniciar a contagem.
 - Entrar em uma mesa pelo menu ou pelo avanco prepara a primeira rodada, mesmo se a mesa ja foi usada. Tempos restantes sao preservados; uma rodada esgotada volta a 10 minutos quando iniciada pelo avanco.
