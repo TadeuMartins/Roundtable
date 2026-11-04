@@ -36,8 +36,15 @@
     .timer[data-urgent="true"] .timer-meter span { background: var(--amber); }
     .timer[data-status="finished"] .clock { color: var(--rose); }
     main { flex: 1; display: flex; flex-direction: column; padding-top: 40px; }
-    .session-picker { align-self: flex-start; max-width: 100%; color: var(--mint); background: var(--ink); border: 0; border-radius: 0; font: inherit; font-size: 14px; line-height: 1.5; margin: 0 0 18px; padding: 2px 6px 2px 0; cursor: pointer; }
+    .session-control { position: relative; align-self: flex-start; max-width: 100%; margin: 0 0 18px; }
+    .session-picker { display: flex; align-items: center; gap: 8px; max-width: 100%; color: var(--mint); font-size: 14px; line-height: 1.5; padding: 2px 0; cursor: pointer; list-style: none; }
+    .session-picker::-webkit-details-marker { display: none; }
+    .session-picker svg { width: 14px; height: 14px; flex-shrink: 0; }
     .session-picker:focus-visible { outline: 2px solid var(--mint); outline-offset: 5px; }
+    .session-options { position: absolute; z-index: 5; top: calc(100% + 8px); left: 0; width: 280px; max-width: calc(100vw - 40px); padding: 6px; background: var(--ink); border: 1px solid var(--line); border-radius: 4px; box-shadow: 0 8px 24px #0006; }
+    .session-options button { display: block; width: 100%; padding: 12px 10px; text-align: left; font-size: 13px; background: none; border: 0; }
+    .session-options button:hover, .session-options button:focus-visible { background: #ffffff10; }
+    .session-options button[aria-current="true"] { color: var(--mint); }
     h1 { font-size: 64px; font-weight: 400; line-height: 1.04; max-width: 1320px; margin: 0; text-wrap: balance; }
     h1 span { color: var(--mint); }
     .rounds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px; margin: 38px 0 30px; }
@@ -95,12 +102,15 @@
       </div>
     </header>
     <main id="topic" aria-labelledby="theme" tabindex="0">
-      <select id="session" class="session-picker" aria-label="Roda de conversa atual">
-        <option value="0">Roda de Conversa T&#233;cnica 1</option>
-        <option value="1">Roda de Conversa T&#233;cnica 2</option>
-        <option value="2">Roda de Conversa Executiva 1</option>
-        <option value="3">Roda de Conversa Executiva 2</option>
-      </select>
+      <details id="session-control" class="session-control">
+        <summary id="session" class="session-picker"><span id="session-name">Roda de Conversa T&#233;cnica 1</span><i data-lucide="chevron-down"></i></summary>
+        <div class="session-options" role="group" aria-label="Escolher roda de conversa">
+          <button type="button" data-panel="0">Roda de Conversa T&#233;cnica 1</button>
+          <button type="button" data-panel="1">Roda de Conversa T&#233;cnica 2</button>
+          <button type="button" data-panel="2">Roda de Conversa Executiva 1</button>
+          <button type="button" data-panel="3">Roda de Conversa Executiva 2</button>
+        </div>
+      </details>
       <h1 id="theme"></h1>
       <div class="rounds">
         <section class="round" id="round-0" aria-labelledby="round-title-0"><div class="round-head"><span class="round-number">01</span><h2 id="round-title-0">Realidade atual</h2></div><p class="question" id="question-0"></p></section>
@@ -183,7 +193,8 @@
       }
     } catch {}
     const timerElements = [...document.querySelectorAll('.timer')];
-    const sessionPicker = document.getElementById('session');
+    const sessionControl = document.getElementById('session-control');
+    const sessionOptions = [...sessionControl.querySelectorAll('[data-panel]')];
     function save() {
       try { localStorage.setItem(storageKey, JSON.stringify({selectedPanel, timers, steps})); } catch {}
     }
@@ -240,6 +251,7 @@
       if (changed) save();
     }
     function advance() {
+      sessionControl.open = false;
       const step = steps[selectedPanel];
       if (step === 3) return;
       timers[selectedPanel].forEach(timer => {
@@ -269,7 +281,8 @@
     function selectPanel(panelIndex) {
       selectedPanel = panelIndex;
       const panel = panels[panelIndex];
-      sessionPicker.value = String(panelIndex);
+      document.getElementById('session-name').textContent = sessionOptions[panelIndex].textContent;
+      sessionOptions.forEach((option, index) => option.setAttribute('aria-current', String(index === panelIndex)));
       const focus = document.createElement('span');
       focus.textContent = panel.focus;
       document.getElementById('theme').replaceChildren(panel.title + ' ', focus);
@@ -278,7 +291,20 @@
       refresh();
       save();
     }
-    sessionPicker.addEventListener('change', () => selectPanel(Number(sessionPicker.value)));
+    sessionOptions.forEach(option => option.addEventListener('click', () => {
+      selectPanel(Number(option.dataset.panel));
+      sessionControl.open = false;
+      document.getElementById('advance').focus({preventScroll: true});
+    }));
+    document.addEventListener('click', event => {
+      if (!sessionControl.contains(event.target)) sessionControl.open = false;
+    });
+    sessionControl.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      sessionControl.open = false;
+      document.getElementById('session').focus({preventScroll: true});
+    });
     timerElements.forEach((element, roundIndex) => {
       element.querySelector('.toggle-timer').addEventListener('click', () => {
         const timer = timers[selectedPanel][roundIndex];
@@ -306,9 +332,9 @@
     document.addEventListener('keydown', event => {
       if (event.defaultPrevented || event.repeat || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
       if (!['ArrowRight', 'PageDown'].includes(event.key)) return;
-      if (event.target !== sessionPicker && event.target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]')) return;
+      if (event.target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]')) return;
       event.preventDefault();
-      if (event.target === sessionPicker) document.getElementById('advance').focus({preventScroll: true});
+      if (sessionControl.contains(event.target)) document.getElementById('advance').focus({preventScroll: true});
       advance();
     });
     document.getElementById('motion').addEventListener('click', () => { motionEnabled = !motionEnabled; updateMotion(); });

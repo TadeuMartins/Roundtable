@@ -10,7 +10,7 @@ https://tadeumartins.github.io/Roundtable/
 ## Apresentacao
 
 - O botao de avancar inicia o bloco 1, depois o bloco 2 e depois abre a proxima mesa.
-- Page Down e a seta direita executam o mesmo comando, inclusive quando o seletor de mesa esta com foco.
+- Page Down e a seta direita executam o mesmo comando, inclusive com o menu de mesas aberto. O menu fecha ao avancar.
 - Apenas o nome da roda atual aparece acima do titulo. O seletor compacto permite escolher outra mesa diretamente.
 - Ao avancar, o cronometro anterior fica pausado; a proxima mesa abre sem iniciar a contagem.
 - Na ultima mesa, o comando encerra a sequencia, sem voltar ao inicio.
