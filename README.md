@@ -9,7 +9,7 @@ https://tadeumartins.github.io/Roundtable/
 
 ## Apresentacao
 
-- Tema e dados dos participantes ficam alinhados a esquerda, com a parte principal do titulo em negrito. O rodape exibe a data e uma animacao compacta de cada tema, com pausa e suporte a movimento reduzido; "Beyond the Stage" aparece apenas no cabecalho.
+- Tema e dados dos participantes ficam alinhados a esquerda, com a parte principal do titulo em negrito e as perguntas em tamanho menor. O rodape exibe a data a esquerda e o QR Code no canto inferior direito, sem animacoes; "Beyond the Stage" aparece apenas no cabecalho.
 - O botao de avancar inicia o bloco 1, depois o bloco 2 e depois abre o proximo evento do programa. Cada evento avanca com um clique; a mesa seguinte abre com os cronometros parados.
 - Page Down e a seta direita executam o mesmo comando, inclusive com o menu de mesas aberto. O menu fecha ao avancar.
 - A seta esquerda, Page Up e o botao de voltar percorrem a sequencia no sentido inverso, incluindo as rodadas e os eventos. Voltar preserva o tempo restante e deixa os cronometros pausados; no inicio, nao volta ao fim.
@@ -47,6 +47,6 @@ Site estatico, sem build e sem dependencias remotas de interface.
 O GitHub Pages publica a raiz da branch `main`; `.nojekyll` desativa o processamento Jekyll.
 Alteracoes enviadas a `main` sao publicadas automaticamente pelo GitHub Pages.
 
-Para uso local e sem internet, abrir `index.html` mantendo os arquivos e as pastas `Lean`, `People` e `Events` juntos.
+Para uso local e sem internet, abrir `index.html` mantendo os arquivos e as pastas `People` e `Events` juntos.
 Nao e necessario servidor, instalacao ou acesso ao GitHub Pages. Apenas o formulario externo do QR Code depende de internet.
 Nao estao incluidos roteiros internos, audios ou apresentacoes PowerPoint.
